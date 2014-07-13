@@ -18,8 +18,9 @@ INSTALLATION:
 
    Use the cmake build system. From the top level directory:
 
-     cd ./build
-     cmake ../.
+     mkdir build
+     cd build
+     cmake ..
      make all
      sudo make install
 
@@ -56,7 +57,7 @@ INSTRUCTIONS
 
 	2. Start the metadatadb server against this database file.
 
-	   ./metadatadb -i /path/to/database/file/audio.b
+	   ./metadatadb -i /path/to/database/file/audio.db
 
 	   Be sure to use an absolute path. Check the -h option 
            for other settings you might want to make.
@@ -120,7 +121,7 @@ INSTRUCTIONS
 
 REQUISITE SOFTWARE
 -----------------------------------------------------------------------
-zeromq version 2.0.2 www.zeromq.org
+zeromq version 3.x www.zeromq.org
 sqlite3 version 3.6.23 www.sqlite.org
 sndfile version 1.0.21 www.mega-nerd.com/libsndfile
 
@@ -131,5 +132,6 @@ libvorbis 1.3.0
 
 samplerate version 0.1.7 www.mega-nerd.com/SRC (NOTE: install sndfile before samplerate)
 mpg123 version 1.12.1 www.mpg123.de/api (for mp3 support)
+opencore-amr 0.1.3
 
 Qt 4.7.1 (required for the GUI client application)
