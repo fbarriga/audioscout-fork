@@ -288,16 +288,16 @@ void* do_forward(void *arg){
     int i = 0;
     while (1){
 	zmq_msg_init(&msg);
-	zmq_recv(pullskt, &msg, 0);
+	zmq_recvmsg(pullskt, &msg, 0);
 	zmq_getsockopt(pullskt, ZMQ_RCVMORE, &more, &more_size);
-	zmq_send(pubskt, &msg, (more) ? ZMQ_SNDMORE : 0);
+	zmq_sendmsg(pubskt, &msg, (more) ? ZMQ_SNDMORE : 0);
 	zmq_msg_close(&msg);
 
 	while (more){
 	    zmq_msg_init(&msg);
-	    zmq_recv(pullskt, &msg, 0);
+	    zmq_recvmsg(pullskt, &msg, 0);
 	    zmq_getsockopt(pullskt, ZMQ_RCVMORE, &more, &more_size);
-	    zmq_send(pubskt, &msg, (more) ? ZMQ_SNDMORE : 0);
+	    zmq_sendmsg(pubskt, &msg, (more) ? ZMQ_SNDMORE : 0);
 	    zmq_msg_close(&msg);
 	}
     }
@@ -315,7 +315,7 @@ int waitresults(void *skt, uint32_t *id){
     zmq_msg_t msg;
     zmq_msg_init(&msg);
     do {
-	err = zmq_recv(skt, &msg, ZMQ_NOBLOCK);
+	err = zmq_recvmsg(skt, &msg, ZMQ_NOBLOCK);
     } while (err && time(NULL) < curr + WAIT_TIME_SECONDS);
     if (err == 0) memcpy(id, zmq_msg_data(&msg), sizeof(uint32_t));
     zmq_msg_close(&msg);

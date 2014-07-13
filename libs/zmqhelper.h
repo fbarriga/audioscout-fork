@@ -65,7 +65,7 @@ int recvsnd(void *rcvskt, void *sndskt, size_t *msg_size, int64_t *more, size_t 
     zmq_msg_t topic_msg;
     zmq_msg_t msg;
     zmq_msg_init(&msg);
-    zmq_recv(rcvskt, &msg, 0);
+    zmq_recvmsg(rcvskt, &msg, 0);
     *msg_size = zmq_msg_size(&msg);
     if (data){
 	*data = malloc(*msg_size);
@@ -74,10 +74,10 @@ int recvsnd(void *rcvskt, void *sndskt, size_t *msg_size, int64_t *more, size_t 
     if (topic){
 	zmq_msg_init_size(&topic_msg, strlen(topic));
         memcpy(zmq_msg_data(&topic_msg), topic, strlen(topic));
-	zmq_send(sndskt, &topic_msg, ZMQ_SNDMORE);
+	zmq_sendmsg(sndskt, &topic_msg, ZMQ_SNDMORE);
 	zmq_msg_close(&topic_msg);
     }
-    int res = zmq_send(sndskt, &msg, (more) ? ZMQ_SNDMORE : 0);
+    int res = zmq_sendmsg(sndskt, &msg, (more) ? ZMQ_SNDMORE : 0);
     zmq_getsockopt(rcvskt, ZMQ_RCVMORE, more, more_size);
     zmq_msg_close(&msg);
 
@@ -90,7 +90,7 @@ int recieve_msg(void *skt, size_t *msg_size, int64_t *more, size_t *more_size,\
 
     zmq_msg_t msg;
     zmq_msg_init(&msg);
-    int res = zmq_recv(skt, &msg, 0);
+    int res = zmq_recvmsg(skt, &msg, 0);
     if (msg_size){
 	*msg_size = zmq_msg_size(&msg);
     }
@@ -106,7 +106,7 @@ int recieve_msg(void *skt, size_t *msg_size, int64_t *more, size_t *more_size,\
 int send_empty_msg(void *skt){
     zmq_msg_t msg;
     zmq_msg_init_size(&msg, 0);
-    int res = zmq_send(skt, &msg, 0);
+    int res = zmq_sendmsg(skt, &msg, 0);
     zmq_msg_close(&msg);
     return res;
 }
@@ -115,7 +115,7 @@ int send_msg_vsm(void *skt, void *data, size_t size){
     zmq_msg_t msg;
     zmq_msg_init_size(&msg, size);
     memcpy(zmq_msg_data(&msg), data, size);
-    int res = zmq_send(skt, &msg, 0);
+    int res = zmq_sendmsg(skt, &msg, 0);
     zmq_msg_close(&msg);
     return res;
 }
@@ -124,7 +124,7 @@ int sendmore_msg_vsm(void *skt, void *data, size_t size){
     zmq_msg_t msg;
     zmq_msg_init_size(&msg, size);
     memcpy(zmq_msg_data(&msg), data, size);
-    int res = zmq_send(skt, &msg, ZMQ_SNDMORE);
+    int res = zmq_sendmsg(skt, &msg, ZMQ_SNDMORE);
     zmq_msg_close(&msg);
     return res;
 }
@@ -132,7 +132,7 @@ int sendmore_msg_vsm(void *skt, void *data, size_t size){
 int send_msg_data(void *skt,void *data,size_t size,void *freefnc,void *hint){
     zmq_msg_t msg;
     zmq_msg_init_data(&msg, data, size, freefnc, hint);
-    int res = zmq_send(skt, &msg, 0);
+    int res = zmq_sendmsg(skt, &msg, 0);
     zmq_msg_close(&msg);
     return res;
 }
@@ -140,7 +140,7 @@ int send_msg_data(void *skt,void *data,size_t size,void *freefnc,void *hint){
 int sendmore_msg_data(void *skt,void *data,size_t size,void *freefnc,void *hint){
     zmq_msg_t msg;
     zmq_msg_init_data(&msg, data, size, freefnc, hint);
-    int res = zmq_send(skt, &msg, ZMQ_SNDMORE);
+    int res = zmq_sendmsg(skt, &msg, ZMQ_SNDMORE);
     zmq_msg_close(&msg);
     return res;
 }
@@ -152,7 +152,7 @@ int flushall_msg_parts(void *skt){
     zmq_getsockopt(skt, ZMQ_RCVMORE, &more, &more_size);
     while (more){
 	zmq_msg_init(&msg);
-	zmq_recv(skt, &msg, 0);
+	zmq_recvmsg(skt, &msg, 0);
 	zmq_getsockopt(skt, ZMQ_RCVMORE, &more, &more_size);
 	zmq_msg_close(&msg);
     }

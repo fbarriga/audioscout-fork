@@ -67,14 +67,14 @@ int main(int argc, char **argv){
 
 	zmq_msg_init_size(&cmd_msg, sizeof(uint32_t));
 	memcpy(zmq_msg_data(&cmd_msg), &cmd, sizeof(uint32_t));
-	zmq_send(skt, &cmd_msg, ZMQ_SNDMORE);
+	zmq_sendmsg(skt, &cmd_msg, ZMQ_SNDMORE);
 
 	zmq_msg_init_size(&uid_msg, sizeof(uint32_t));
 	memcpy(zmq_msg_data(&uid_msg), &suid, sizeof(uint32_t));
-	zmq_send(skt, &uid_msg, 0);
+	zmq_sendmsg(skt, &uid_msg, 0);
 
 	zmq_msg_init(&mdata_msg);
-	zmq_recv(skt, &mdata_msg, 0);
+	zmq_recvmsg(skt, &mdata_msg, 0);
 	
 	mdatastr = (char*)zmq_msg_data(&mdata_msg);
 	printf("result: %s\n", mdatastr);

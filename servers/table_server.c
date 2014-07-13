@@ -415,7 +415,7 @@ int init_server(void *ctx){
     int err = 0;
     /* wait until error is recieved or until time alloted is up */
     do {
-	err = zmq_recv(skt, &msg, ZMQ_NOBLOCK);
+	err = zmq_recvmsg(skt, &msg, ZMQ_NOBLOCK);
 	sleep(1);
     } while (err && time(NULL) <= curr_time + 10);
     if (err){
@@ -464,7 +464,7 @@ int kill_server(){
     zmq_msg_init(&msg);
     int err = 0;
     do {
-	err = zmq_recv(skt, &msg, ZMQ_NOBLOCK);
+	err = zmq_recvmsg(skt, &msg, ZMQ_NOBLOCK);
 	sleep(1);
     } while (err && time(NULL) < curr_time + 10 );
     if (err){
@@ -496,7 +496,7 @@ static int send_results(void *skt, uint8_t threadnb, uint32_t id, float cs){
     time_t curr_time;
     time(&curr_time);
     do {
-      err = zmq_recv(skt, &msg, ZMQ_NOBLOCK);
+      err = zmq_recvmsg(skt, &msg, ZMQ_NOBLOCK);
       sleep(1);
     } while (err && time(NULL) < curr_time + 10 );
     if (!err){
