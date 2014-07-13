@@ -75,8 +75,9 @@ endif(CMAKE_HOST_WIN32)
 
 install(FILES phash_audio.h DESTINATION include)
 install(FILES audiodata.h DESTINATION include)
-install(FILES pHashAudioConfig.h DESTINATION include)
+install(FILES ${PROJECT_BINARY_DIR}/pHashAudioConfig.h DESTINATION include)
 
 if (CMAKE_HOST_UNIX)
    install(TARGETS audioindex DESTINATION bin)
+   install(TARGETS pHashAudio AudioData DESTINATION lib)
 endif(CMAKE_HOST_UNIX)
