@@ -1,0 +1,50 @@
+<project name="phashAudio-jni" default="compile" >
+
+  <target name="init" description="creates some directories">
+    <mkdir dir="build/classes"/>
+    <mkdir dir="build/tests"/>
+    <mkdir dir="build/auscoutclient" />
+    <mkdir dir="dist"/>
+  </target>
+
+  <target name="create-manifest" depends="init" description="make the manifest">
+    <tstamp>
+      <format property="NOW" pattern="yyyy-MM-dd hh:mm aa"/>
+    </tstamp>
+	
+    <manifest file="build/MANIFEST.MF">
+      <attribute name="Built-By" value="${user.name}"/>
+      <attribute name="Built-On" value="${NOW}"/>
+    </manifest>
+  </target>
+
+  <target name="compile" depends="init,create-manifest" description="Compiles the source code and creates a jar in dist" >
+    <javac srcdir="src/" destdir="build/classes/" debug="true" debuglevel="lines,vars,source" />
+    <jar destfile="dist/pHashAudio.jar" basedir="build/classes/" manifest="build/MANIFEST.MF"/>
+
+    <javac srcdir="tests/" destdir="build/tests/" classpath="build/classes"
+                        debug="true" debuglevel="lines,vars,source" />
+    <echo>compilation complete!</echo>
+  </target>
+
+  <target name="auscout" depends="compile" description="Compile Auscout Client test program" >
+    <javac classpath="dist/pHashAudio.jar:/usr/local/share/java/zmq.jar" srcdir="src-auscoutclient" destdir="build/auscoutclient" />
+  </target>
+
+
+  <target name="header" depends="compile" >
+	<javah destdir="." force="yes" verbose="yes" classpath="./build/classes/">
+	  <class name="org.pHash.AudioData" />
+	  <class name="org.pHash.AudioMetaData" />
+	  <class name="org.pHash.AudioHash" />
+	  <class name="org.pHash.AudioHash.AudioHashObject" />
+	</javah>
+  </target>
+
+
+  <target name="clean" description="cleanup">
+    <delete dir="build"/>
+    <delete dir="dist"/>
+  </target>
+
+</project>

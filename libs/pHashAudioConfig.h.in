@@ -1,0 +1,5 @@
+#define pHashAudio_VERSION_MAJOR @pHashAudio_VERSION_MAJOR@
+#define pHashAudio_VERSION_MINOR @pHashAudio_VERSION_MINOR@
+#cmakedefine HAVE_MPG123
+#cmakedefine HAVE_AMR
+#cmakedefine BUILD_DLL

@@ -1,0 +1,46 @@
+digraph bd {
+	randir=LR;
+	bgcolor = transparent;
+
+	auscoutd [shape=box3d,width=1.5,height=1,style="bold, filled", fillcolor=red]; 
+	tblservd0 [shape=box3d,style="filled", fillcolor=skyblue]; 
+	tblservd1 [shape=box3d,style="filled", fillcolor=skyblue];
+	tblservd2 [shape=box3d,style="filled", fillcolor=skyblue];
+	tblservdn [shape=box3d,style="filled", fillcolor=skyblue];
+
+	publish [shape="point"];
+
+	metadatadb [shape=box3d,width=1,height=0.80,style="filled",fillcolor=lightblue]; 
+	mdatadb [shape=tab, style="filled", fillcolor=beige];
+
+	metadatadb -> mdatadb;
+	
+	auscoutd -> publish [arrowhead="normal"];
+
+	publish -> tblservd0 [arrowhead="vee"];
+	publish -> tblservd1 [arrowhead="vee"];
+	publish -> tblservd2 [arrowhead="vee"];
+	publish -> tblservdn [arrowhead="vee"];
+
+	tblservd0 -> auscoutd   [style="dotted", arrowhead="vee"];
+	tblservd1 -> auscoutd   [style="dotted", arrowhead="vee"];
+	tblservd2 -> auscoutd   [style="dotted", arrowhead="vee"];
+	tblservdn -> auscoutd   [style="dotted", arrowhead="vee"];
+
+	index0 [shape=tab, style="filled", fillcolor = tan];
+	index1 [shape=tab, style="filled", fillcolor = tan];
+	index2 [shape=tab, style="filled", fillcolor = tan];
+	indexn [shape=tab, style="filled", fillcolor = tan];
+
+	tblservd0 -> index0;
+	tblservd1 -> index1;
+	tblservd2 -> index2;
+	tblservdn -> indexn;
+
+	auscoutd   -> metadatadb;
+
+	client_app [shape="rect", style="filled", fillcolor = "antiquewhite"];
+
+	client_app -> auscoutd;
+
+}

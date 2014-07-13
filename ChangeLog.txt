@@ -1,0 +1,5 @@
+
+11-12-2012 added in function readaudio_amr() to audiodata.c
+           to handle amr file format.  Relies on dep
+           opencore-amrnb library can be obtained here:
+	   http://opencore-amr.sourceforge.net
