@@ -9,6 +9,7 @@ set(Servers_MINOR_VERSION 0)
 add_definitions("-g -O3 -shared -fPIC")
 
 include_directories("${PROJECT_SOURCE_DIR}/../libs")
+include_directories("${PROJECT_BINARY_DIR}/../libs")
 link_directories   ("${PROJECT_BINARY_DIR}/../libs")
 
 find_library(HAVE_PTHREAD pthread)

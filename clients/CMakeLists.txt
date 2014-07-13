@@ -7,6 +7,7 @@ set(AudioScoutClient_MINOR_VERSION 0)
 add_definitions("-g -O3")
 
 include_directories("${PROJECT_SOURCE_DIR}/../libs")
+include_directories("${PROJECT_BINARY_DIR}/../libs")
 link_directories("${PROJECT_BINARY_DIR}/../libs")
 
 add_executable(auscoutclient auscout-client.c)
