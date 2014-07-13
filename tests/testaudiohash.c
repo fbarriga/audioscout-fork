@@ -37,7 +37,8 @@ int main (int argc, char **argv){
   const float nbsecs = 0.0f;
 
   if (argc < 2){
-    printf("not enough input args\n");
+    printf("Usage: %s DIRECTORY\n", argv[0] );
+    printf("Generate hash of audio files inside DIRECTORY\n");
     return -1;
   }
 
@@ -55,7 +56,7 @@ int main (int argc, char **argv){
   AudioHashStInfo *hash_st = NULL;
 
   clock_t total = 0;
-  unsigned int i,j;
+  unsigned int i;
   int err;
   for (i=0;i<nbfiles;i++){
     printf("file[%u]: %s\n", i, files[i]);
