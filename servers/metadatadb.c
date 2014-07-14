@@ -185,12 +185,16 @@ void init_process(){
     else {
 	chdir(WORKING_DIR);
     }
+    char *current_dir = get_current_dir_name();
 
     lock_fd = open(LOCKFILE, O_RDWR|O_CREAT, 0755);
-    if (i < 0)exit(1);
-    if (lockf(lock_fd, F_TLOCK, 0) < 0) exit(0);
+    if (lockf(lock_fd, F_TLOCK, 0) < 0)
+    {
+        syslog(LOG_ERR, "Server already running. Try to kill server and delete lockfile: %s/%s\n", current_dir, LOCKFILE);
+        free( current_dir );
+        exit(1);
+    }
 
-    openlog(LOG_IDENT, LOG_PID, LOG_USER);
     setlogmask(GlobalArgs.level);
 
     /*first instance only */
@@ -446,6 +450,7 @@ void* dowork(void *arg){
 int main(int argc, char **argv){
     char addr[32];
 
+    openlog("metadatadb",LOG_PERROR,LOG_USER);
     init_options();
     parse_options(argc, argv);
 
