@@ -483,12 +483,24 @@ int main(int argc, char **argv){
     }
 
     unsigned int i;
-    pthread_t worker_thr;
-    for (i=0;i < GlobalArgs.nbthreads;i++){
-	assert(pthread_create(&worker_thr, NULL, dowork, ctx) == 0);
+    pthread_t *thread_id;
+
+    thread_id = calloc(GlobalArgs.nbthreads, sizeof(thread_id));
+    if (thread_id == NULL) {
+        syslog(LOG_CRIT,"MAIN ERROR: error allocating memory for threads");
+        exit(1);
     }
 
-    assert(zmq_device(ZMQ_QUEUE, clients_skt, workers_skt) == 0);
+    for (i=0;i < GlobalArgs.nbthreads;i++){
+	assert(pthread_create( &thread_id[i], NULL, dowork, ctx) == 0);
+    }
 
+    zmq_device(ZMQ_QUEUE, clients_skt, workers_skt);
+
+    for (i=0;i < GlobalArgs.nbthreads;i++){
+        pthread_join( &thread_id[i], NULL );
+    }
+
+    free( thread_id );
     return 0;
 }
