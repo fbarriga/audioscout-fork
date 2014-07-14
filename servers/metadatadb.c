@@ -44,11 +44,12 @@
 #define LOG_IDENT  "metadatadb"
 #define LOCKFILE "metadatadb.lock"
 
-static const char *opt_string = "w:d:l:p:n:vh?";
+static const char *opt_string = "w:f:i:l:p:n:vh?";
 
 static const struct option longOpts[] = {
     { "wd", required_argument, NULL, 'w' },
-    { "db", required_argument, NULL, 'd'},
+    { "foreground", no_argument, NULL, 'f'},
+    { "db", required_argument, NULL, 'i'},
     { "level", required_argument, NULL, 'l' },
     { "port", required_argument, NULL, 'p'},
     { "threads", required_argument, NULL, 'n'},
@@ -60,6 +61,7 @@ static const struct option longOpts[] = {
 struct globalargs_t {
     char *wd;
     char *dbname;
+    int foreground;
     int level;         /* log level, as defined in syslog.h */
     int port;
     int nbthreads;
@@ -75,6 +77,7 @@ void init_options(){
     GlobalArgs.nbthreads = 10;
     GlobalArgs.verboseflag = 0;
     GlobalArgs.helpflag = 0;
+    GlobalArgs.foreground = 0;
 }
 
 void parse_options(int argc, char **argv){
@@ -82,7 +85,10 @@ void parse_options(int argc, char **argv){
     char opt = getopt_long(argc,argv,opt_string, longOpts, &longIndex);
     while (opt != -1){
 	switch(opt){
-	case 'd':
+	case 'f':
+	    GlobalArgs.foreground = 1;
+	    break;
+	case 'i':
 	    GlobalArgs.dbname = optarg;
 	    break;
 	case 'w':
@@ -115,7 +121,8 @@ void parse_options(int argc, char **argv){
 void metadatadb_usage(){
     fprintf(stdout,"auscoutd [options]\n\n");
     fprintf(stdout,"options:\n");
-    fprintf(stdout,"-d --db              name of the path to the db sql file - mandatory\n");
+    fprintf(stdout,"-i --db              name of the path to the db sql file - mandatory\n");
+    fprintf(stdout,"-f --foreground      don't run as daemon\n");
     fprintf(stdout,"-p --port            port to bind on - default 4000\n");
     fprintf(stdout,"-n --threads         number worker threads (default 10)\n");
     fprintf(stdout,"-w --wd              working directory for the server\n");
@@ -134,10 +141,10 @@ void kill_server(){
 }
 
 void handle_signal(int sig){
-
     switch (sig){
     case SIGHUP:
     case SIGTERM:
+    case SIGINT:
 	syslog(LOG_INFO, "recieved signal, %d", sig);
 	kill_server();
 	kill_process();
@@ -149,24 +156,28 @@ void init_process(){
     int fv,i;
 
     if (getpid() == 1) {
-	fprintf(stderr, "process already running\n");
+	syslog( LOG_ERR, "process already running\n");
 	return;
     }
-    fv = fork();
-    if (fv < 0){fprintf(stderr,"cannot fork\n");  exit(1);}
-    if (fv > 0)exit(0);
+
+    if( GlobalArgs.foreground == 0 ) {
+        fv = fork();
+        if (fv < 0){fprintf(stderr,"cannot fork\n");  exit(1);}
+        if (fv > 0)exit(0);
     
-    /* daemon continues */
-    setsid();
+        /* daemon continues */
+        setsid();
 
-    /* close all file descrs */ 
-    for (i=getdtablesize();i >= 0; --i) close(i);
+        /* close all file descrs */ 
+        //for (i=getdtablesize();i >= 0; --i) close(i);
 
-    /* redirect stdin, stdout, stderr */ 
-    i = open("/dev/null", O_RDWR);
+        /* redirect stdin, stdout, stderr */ 
+        i = open("/dev/null", O_RDWR);
+    }
+
     dup(i);
     dup(i);
-    
+
     umask(0);
     if (GlobalArgs.wd){
 	chdir(GlobalArgs.wd);
@@ -187,16 +198,21 @@ void init_process(){
     signal(SIGTSTP, SIG_IGN); /* ignore tty signals */ 
     signal(SIGTTOU, SIG_IGN);
     signal(SIGTTIN, SIG_IGN);
+
+    signal(SIGINT, handle_signal);
     signal(SIGHUP, handle_signal);
     signal(SIGTERM, handle_signal);
 
     syslog(LOG_INFO, "process init complete");
-
 }
+
 void kill_process(){
 
     lockf(lock_fd, F_ULOCK, 0);
     close(lock_fd);
+    if( unlink(LOCKFILE) != 0 ) {
+        syslog(LOG_ERR,"Error, cannot delete lock file: %s\n", LOCKFILE );
+    }
     syslog(LOG_INFO,"kill process");
     closelog();
 }
